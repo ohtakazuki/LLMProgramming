@@ -1,0 +1,6 @@
+{
+    // Import "***" could not be resolved Pylance(reportMissingImports) の警告対応
+    "python.analysis.extraPaths" : [
+        "./.venv/Lib/site-packages/"
+    ],
+}

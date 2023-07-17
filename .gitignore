@@ -1,0 +1,6 @@
+.chroma
+.venv
+chroma_db
+storage01
+storage02
+.env
