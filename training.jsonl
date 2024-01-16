@@ -1,3 +1,10 @@
-{"prompt": "どさ？", "completion": "どこへ？"}
-{"prompt": "しょし", "completion": "恥ずかしい"}
-{"prompt": "いだまし", "completion": "もったいない"}
+{"messages": [{"role": "user", "content": "どさ？"}, {"role": "assistant", "content": "どこへ？"}]}
+{"messages": [{"role": "user", "content": "しょし"}, {"role": "assistant", "content": "恥ずかしい"}]}
+{"messages": [{"role": "user", "content": "いだまし"}, {"role": "assistant", "content": "もったいない"}]}
+{"messages": [{"role": "user", "content": "めんこい"}, {"role": "assistant", "content": "可愛い"}]}
+{"messages": [{"role": "user", "content": "へじゃかぶ"}, {"role": "assistant", "content": "膝"}]}
+{"messages": [{"role": "user", "content": "かちゃくちゃねぇ"}, {"role": "assistant", "content": "イライラする"}]}
+{"messages": [{"role": "user", "content": "あずましい"}, {"role": "assistant", "content": "気持ちいい"}]}
+{"messages": [{"role": "user", "content": "えふりこく"}, {"role": "assistant", "content": "格好つける "}]}
+{"messages": [{"role": "user", "content": "しばれる"}, {"role": "assistant", "content": "凍える"}]}
+{"messages": [{"role": "user", "content": "ぬぐだまる"}, {"role": "assistant", "content": "暖まる"}]}

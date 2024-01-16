@@ -3,21 +3,21 @@ import os
 from dotenv import load_dotenv
 from langchain.document_loaders import PyPDFLoader
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
-from langchain.chains import RetrievalQA
-from langchain.llms import OpenAI
-from langchain.agents import Tool
-from langchain.agents import AgentType
-from langchain.agents import initialize_agent
+from langchain_openai import ChatOpenAI
+from langchain import hub
+from langchain.tools.retriever import create_retriever_tool
+from langchain.agents import create_openai_functions_agent
+from langchain.agents import AgentExecutor
 import streamlit as st
 
 # 環境変数の読み込み
 load_dotenv()
 os.environ["OPENAI_API_KEY"] = os.environ["API_KEY"]
 
-# Indexの構築
-def create_index():
+# Retrieverの作成
+def create_retriever():
     # PDFの読込
     loader = PyPDFLoader("./data2/001615363.pdf")
     documents = loader.load()
@@ -29,30 +29,35 @@ def create_index():
     # Indexの構築
     db = Chroma.from_documents(texts, OpenAIEmbeddings())
 
-    st.session_state["db"] = db
+    # 検索（Retriever）の取得
+    retriever = db.as_retriever()
 
-    return db
+    st.session_state["retriever"] = retriever
 
-# Agentの作成
-def create_agent():
-    # RetrievalQAチェーンの作成
-    qa = RetrievalQA.from_chain_type(
-        llm=OpenAI(temperature=1.2),
-        chain_type="stuff",
-        retriever=db.as_retriever())
+    return retriever
 
+# AgentExecutorの作成
+def create_agent_executor():
     tools = [
-        Tool(
-            name="訪日外国人旅行者QAシステム",
-            func=qa.run,
-            description="訪日外国人の旅行や土産品、消費動向に関する質問に役立ちます。",
-        )]
+        create_retriever_tool(
+            retriever,
+            "ForeignTravelersQASystem",
+            "訪日外国人の旅行や土産品、消費動向に関する質問に役立ちます。",
+        )
+    ]
 
-    return initialize_agent(
-        tools,
-        llm=OpenAI(), 
-        agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-        verbose=True,)
+    # モデルの作成
+    llm = ChatOpenAI(model="gpt-3.5-turbo-1106", temperature=1.2)
+
+    prompt = hub.pull("hwchase17/openai-functions-agent")
+
+    agent = create_openai_functions_agent(llm, tools, prompt)
+    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+
+    st.session_state["agent_executor"] = agent_executor
+
+    return agent_executor
+
 
 # タイトル
 st.title("Index検索")
@@ -61,18 +66,18 @@ st.title("Index検索")
 status = st.empty()
 
 # Indexの準備
-if "db" not in st.session_state:
+if "retriever" not in st.session_state:
     status.markdown("Index構築中")
-    db = create_index()
+    retriever = create_retriever()
 else:
-    db = st.session_state["db"]
+    retriever = st.session_state["retriever"]
 
 # Agentの準備
-if "agent" not in st.session_state:
+if "agent_executor" not in st.session_state:
     status.markdown("Agent準備中")
-    agent = create_agent()
+    agent_executor = create_agent_executor()
 else:
-    agent = st.session_state["agent"]
+    agent_executor = st.session_state["agent_executor"]
 
 status.markdown("Index/Agent準備OK")
 
@@ -82,7 +87,7 @@ query = st.text_input("質問：")
 # Submit時の処理
 if query!="":
     status.markdown("回答生成中")
-    agent = create_agent()
-    result = agent.run(input=query)
-    result
+    agent_executor = create_agent_executor()
+    result = agent_executor.invoke({"input": query})
+    result["output"]
     status.markdown("Index/Agent準備OK")
