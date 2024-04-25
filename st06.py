@@ -1,10 +1,10 @@
 # 必要なモジュールをインポート
 import os
 from dotenv import load_dotenv
-from langchain.document_loaders import PyPDFLoader
-from langchain.text_splitter import CharacterTextSplitter
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_text_splitters import CharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
-from langchain.vectorstores import Chroma
+from langchain_community.vectorstores import Chroma
 from langchain_openai import ChatOpenAI
 from langchain import hub
 from langchain.tools.retriever import create_retriever_tool

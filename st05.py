@@ -40,9 +40,11 @@ if prompt := st.chat_input():
 
         # 言語モデルからの回答を取得
         for chunk in response:
-            if chunk.choices[0].delta.content is not None:
-              full_message += chunk.choices[0].delta.content
-            message_placeholder.markdown(full_message + "▌")
+           if chunk.choices:
+               if chunk.choices[0].delta.content is not None:
+                   full_message += chunk.choices[0].delta.content
+                   message_placeholder.markdown(full_message + "▌")
+               message_placeholder.markdown(full_message)
 
         message_placeholder.markdown(full_message)
 
