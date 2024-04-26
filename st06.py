@@ -47,7 +47,7 @@ def create_agent_executor():
     ]
 
     # モデルの作成
-    llm = ChatOpenAI(model="gpt-3.5-turbo-1106", temperature=1.2)
+    llm = ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=1.2)
 
     prompt = hub.pull("hwchase17/openai-functions-agent")
 
