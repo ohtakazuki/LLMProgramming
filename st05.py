@@ -1,12 +1,13 @@
 # 必要なモジュールをインポート
 import os
 from dotenv import load_dotenv
-import openai
+from openai import OpenAI
 import streamlit as st
 
-# 環境変数の読み込み
+# 環境変数の取得
 load_dotenv()
-openai_api_key = os.environ['API_KEY']
+# OpenAI APIクライアントを生成
+client = OpenAI(api_key=os.environ['API_KEY'])
 
 # タイトル
 st.title("💬 Chatbot")
@@ -21,8 +22,6 @@ for msg in st.session_state.messages:
 
 # チャット入力をpromptに代入かつ判定
 if prompt := st.chat_input():
-    openai.api_key = openai_api_key
-
     # ユーザーからの質問をメッセージリストに追加
     st.session_state.messages.append({"role": "user", "content": prompt})
 
@@ -30,8 +29,8 @@ if prompt := st.chat_input():
     st.chat_message("user").write(prompt)
 
     # 言語モデルへリクエスト
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo-0125",
         messages=st.session_state.messages,
         stream=True)
 
@@ -41,8 +40,11 @@ if prompt := st.chat_input():
 
         # 言語モデルからの回答を取得
         for chunk in response:
-            full_message += chunk['choices'][0]['delta'].get('content', '')
-            message_placeholder.markdown(full_message + "▌")
+           if chunk.choices:
+               if chunk.choices[0].delta.content is not None:
+                   full_message += chunk.choices[0].delta.content
+                   message_placeholder.markdown(full_message + "▌")
+               message_placeholder.markdown(full_message)
 
         message_placeholder.markdown(full_message)
 
