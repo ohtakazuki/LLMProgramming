@@ -17,8 +17,8 @@ google-api-python-client==2.126.0
 
 # Llama Index
 llama-index==0.10.30
-llama-index-readers-file==0.1.19
-llama-index-llms-openai==0.1.16
+llama-index-readers-file==0.1.27
+llama-index-llms-openai==0.1.25
 flask==3.0.3
 
 # LangChain
